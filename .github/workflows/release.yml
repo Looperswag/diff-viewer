@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify version matches tag
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          TAG_VERSION="${REF_NAME#v}"
+          SCRIPT_VERSION=$(grep -E '^VERSION=' build/build.sh | sed -E 's/^VERSION="([^"]+)"/\1/')
+          PLIST_VERSION=$(awk '/CFBundleShortVersionString/{getline; gsub(/[[:space:]<\/string>]/,""); print}' build/Info.plist)
+          echo "Tag:    $TAG_VERSION"
+          echo "Script: $SCRIPT_VERSION"
+          echo "Plist:  $PLIST_VERSION"
+          if [ "$TAG_VERSION" != "$SCRIPT_VERSION" ] || [ "$TAG_VERSION" != "$PLIST_VERSION" ]; then
+            echo "::error::Version mismatch — bump build/build.sh and build/Info.plist to match the tag before pushing."
+            exit 1
+          fi
+
+      - name: Build .app and .dmg
+        working-directory: build
+        run: |
+          chmod +x build.sh
+          ./build.sh
+
+      - name: Create stable-named DMG copy
+        run: cp dist/CodeReviewTool-*.dmg dist/CodeReviewTool.dmg
+
+      - name: List produced artifacts
+        run: ls -la dist/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/CodeReviewTool-*.dmg
+            dist/CodeReviewTool.dmg
+            index.html
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}

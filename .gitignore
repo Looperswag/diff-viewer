@@ -1,0 +1,17 @@
+# Build artifacts (rebuilt by CI on tag push)
+dist/
+build/_build/
+*.dSYM/
+*.icns
+
+# macOS
+.DS_Store
+
+# Playwright test artifacts
+.playwright-mcp/
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+*.swo
