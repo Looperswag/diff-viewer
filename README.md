@@ -4,12 +4,6 @@
 
 **两个版本的代码或提示词，一眼看清差异 · 一键导出 PDF / 长图分享**
 
-[![Release](https://img.shields.io/github/v/release/Looperswag/diff-viewer?label=release&color=2f81f7)](https://github.com/Looperswag/diff-viewer/releases/latest)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![macOS 11+](https://img.shields.io/badge/macOS-11%2B-lightgrey?logo=apple)](#-下载安装)
-[![Works in any browser](https://img.shields.io/badge/browser-any-brightgreen)](#-下载安装)
-[![Offline-first](https://img.shields.io/badge/offline-first-success)](#-隐私--数据)
-
 [📥 下载安装](#-下载安装) · [✨ 功能特性](#-功能特性) · [🎨 主题预览](#-主题预览) · [🛠 从源码构建](#-从源码构建)
 
 <img src="docs/screenshots/hero.png" alt="主界面" width="100%">
@@ -132,11 +126,6 @@ open ../dist/CodeReviewTool.app
 
 脚本会自动处理通用二进制编译、图标程序化生成、ad-hoc 签名、DMG 打包，产物落到 `dist/`。详细的开发说明在 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-## 🤝 贡献
-
-欢迎 Issue / PR。代码风格、本地开发、发版流程见 [CONTRIBUTING.md](CONTRIBUTING.md)。
-
-如果你觉得这个工具有用，给个 ⭐ 是最好的鼓励。
 
 ## 📄 许可证
 
