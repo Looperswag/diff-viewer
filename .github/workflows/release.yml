@@ -22,13 +22,14 @@ jobs:
           REF_NAME: ${{ github.ref_name }}
         run: |
           TAG_VERSION="${REF_NAME#v}"
+          BASE_VERSION="${TAG_VERSION%%-*}"   # strip prerelease suffix: 1.1.0-rc1 -> 1.1.0
           SCRIPT_VERSION=$(grep -E '^VERSION=' build/build.sh | sed -E 's/^VERSION="([^"]+)"/\1/')
           PLIST_VERSION=$(awk '/CFBundleShortVersionString/{getline; gsub(/[[:space:]<\/string>]/,""); print}' build/Info.plist)
-          echo "Tag:    $TAG_VERSION"
+          echo "Tag:    $TAG_VERSION (base: $BASE_VERSION)"
           echo "Script: $SCRIPT_VERSION"
           echo "Plist:  $PLIST_VERSION"
-          if [ "$TAG_VERSION" != "$SCRIPT_VERSION" ] || [ "$TAG_VERSION" != "$PLIST_VERSION" ]; then
-            echo "::error::Version mismatch — bump build/build.sh and build/Info.plist to match the tag before pushing."
+          if [ "$BASE_VERSION" != "$SCRIPT_VERSION" ] || [ "$BASE_VERSION" != "$PLIST_VERSION" ]; then
+            echo "::error::Version mismatch — bump build/build.sh and build/Info.plist to match the tag (base $BASE_VERSION) before pushing."
             exit 1
           fi
 
