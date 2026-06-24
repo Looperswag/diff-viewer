@@ -392,6 +392,15 @@
     font-weight: normal;
   }
 
+  .pane-badge-token {
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    color: var(--accent);
+    border-radius: 999px;
+    padding: 1px 8px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
   .file-btn {
     background: transparent;
     color: var(--text-muted);
@@ -465,6 +474,95 @@
 
   .controls .spacer { flex: 1; }
 
+  /* ---- Diff record (rich-text notes) ---- */
+  .diff-record {
+    margin-top: 14px;
+    margin-bottom: 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    overflow: hidden;
+  }
+  .diff-record-header {
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-light);
+  }
+  .diff-record-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    padding: 6px 10px;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-light);
+  }
+  .diff-record-toolbar select,
+  .diff-record-toolbar button {
+    background: var(--bg-secondary);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 4px 8px;
+    font-size: 12px;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .diff-record-toolbar button { min-width: 28px; }
+  .diff-record-toolbar select:hover,
+  .diff-record-toolbar button:hover { border-color: var(--accent); }
+  .diff-record-toolbar button.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .diff-record-toolbar .dr-color {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 26px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--bg-secondary);
+    cursor: pointer;
+    font-size: 13px;
+    overflow: hidden;
+  }
+  .diff-record-toolbar .dr-color:hover { border-color: var(--accent); }
+  .diff-record-toolbar .dr-color input[type="color"] {
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 6px;
+    border: none;
+    padding: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .diff-record-editor {
+    min-height: 90px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 12px;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.7;
+    outline: none;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+  .diff-record-editor:empty:before {
+    content: attr(data-placeholder);
+    color: var(--text-muted);
+  }
+  .history-item-note { margin-left: 5px; font-size: 11px; }
+
   .stats {
     display: flex;
     gap: 18px;
@@ -476,6 +574,15 @@
   .stat-added { color: var(--added-color); }
   .stat-removed { color: var(--removed-color); }
   .stat-unchanged { color: var(--text-muted); }
+  .stat-tokens {
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    padding-left: 12px;
+    border-left: 1px solid var(--border);
+    margin-left: 4px;
+  }
+  .stat-tokens-delta-up { color: var(--added-color); margin-left: 6px; }
+  .stat-tokens-delta-down { color: var(--removed-color); margin-left: 6px; }
 
   .diff-output {
     background: var(--bg-secondary);
@@ -1004,6 +1111,28 @@
     color: var(--text-muted);
   }
 
+  /* Export record (diff notes shown during PDF print and inside PNG capture) */
+  .export-record {
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+  }
+  .export-record-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .export-record-body {
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.7;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
   /* PNG capture mode: reveal export-header, expand diff (no scroll), force wrap */
   body.exporting-png .export-header { display: block; }
   body.exporting-png .diff-output {
@@ -1036,6 +1165,7 @@
     .sidebar-toggle,
     .input-section,
     .controls,
+    #diffRecordPanel,
     .export-modal-overlay { display: none !important; }
     .app-body {
       display: block !important;
@@ -1119,6 +1249,7 @@
         <div class="label-left">
           <span>原始版本</span>
           <span class="pane-badge" id="originalBadge">0 行</span>
+          <span class="pane-badge pane-badge-token" id="originalTokens">≈ 0 tokens</span>
         </div>
         <label class="file-btn">
           <input type="file" id="originalFile" hidden accept=".txt,.md,.js,.ts,.jsx,.tsx,.py,.java,.go,.rs,.c,.cpp,.h,.html,.css,.json,.yaml,.yml,.xml,.sh,.sql,*">
@@ -1132,6 +1263,7 @@
         <div class="label-left">
           <span>修改版本</span>
           <span class="pane-badge" id="modifiedBadge">0 行</span>
+          <span class="pane-badge pane-badge-token" id="modifiedTokens">≈ 0 tokens</span>
         </div>
         <label class="file-btn">
           <input type="file" id="modifiedFile" hidden accept=".txt,.md,.js,.ts,.jsx,.tsx,.py,.java,.go,.rs,.c,.cpp,.h,.html,.css,.json,.yaml,.yml,.xml,.sh,.sql,*">
@@ -1164,6 +1296,42 @@
     <button id="demo">加载示例</button>
     <button id="clear">清空</button>
     <button id="exportBtn" title="导出 PDF 或长图 PNG，便于转发分享">导出 ▾</button>
+  </div>
+
+  <div class="diff-record" id="diffRecordPanel">
+    <div class="diff-record-header">对比说明 (Diff Record)</div>
+    <div class="diff-record-toolbar" id="diffRecordToolbar">
+      <select data-cmd="fontName" title="字体">
+        <option value="">默认字体</option>
+        <option value="'Microsoft YaHei','微软雅黑',sans-serif">微软雅黑</option>
+        <option value="'SimSun','宋体',serif">宋体</option>
+        <option value="'SimHei','黑体',sans-serif">黑体</option>
+        <option value="'KaiTi','楷体',serif">楷体</option>
+        <option value="'PingFang SC',sans-serif">苹方</option>
+        <option value="Arial,Helvetica,sans-serif">Arial</option>
+        <option value="Georgia,serif">Georgia</option>
+        <option value="'Times New Roman',serif">Times</option>
+        <option value="'Courier New',monospace">Courier</option>
+      </select>
+      <select data-cmd="fontSize" title="字号">
+        <option value="">字号</option>
+        <option value="2">小</option>
+        <option value="3">正常</option>
+        <option value="5">大</option>
+        <option value="6">特大</option>
+      </select>
+      <button type="button" data-cmd="bold" title="加粗"><b>B</b></button>
+      <button type="button" data-cmd="italic" title="斜体"><i>I</i></button>
+      <button type="button" data-cmd="underline" title="下划线"><u>U</u></button>
+      <button type="button" data-cmd="strikeThrough" title="删除线"><s>S</s></button>
+      <label class="dr-color" title="高亮"><span>🖍</span>
+        <input type="color" data-cmd="hiliteColor" value="#fff3a3"></label>
+      <label class="dr-color" title="文字颜色"><span style="text-decoration:underline">A</span>
+        <input type="color" data-cmd="foreColor" value="#e35d6a"></label>
+      <button type="button" data-cmd="removeFormat" title="清除格式">清除</button>
+    </div>
+    <div class="diff-record-editor" id="diffRecord" contenteditable="true" spellcheck="false"
+         data-placeholder="在此记录原始版本与迭代后版本的区别…"></div>
   </div>
 
   <div class="stats" id="stats">
@@ -1235,6 +1403,8 @@ const els = {
   modifiedFile: $("modifiedFile"),
   originalBadge: $("originalBadge"),
   modifiedBadge: $("modifiedBadge"),
+  originalTokens: $("originalTokens"),
+  modifiedTokens: $("modifiedTokens"),
   viewMode: $("viewMode"),
   granularity: $("granularity"),
   ignoreWhitespace: $("ignoreWhitespace"),
@@ -1261,6 +1431,8 @@ const els = {
   exportTitleInput: $("exportTitleInput"),
   exportPdfBtn: $("exportPdfBtn"),
   exportPngBtn: $("exportPngBtn"),
+  diffRecord: $("diffRecord"),
+  diffRecordToolbar: $("diffRecordToolbar"),
 };
 
 // ---------- Theme ----------
@@ -1292,11 +1464,35 @@ function escapeHtml(s) {
     .replace(/>/g, "&gt;");
 }
 
+// 启发式 token 估算：CJK 字符 ≈ 1 token，其余按 4 字符 ≈ 1 token。
+// 不接入真正的分词器以保持单文件 + 离线特性；误差通常 5–15%。
+function estimateTokens(s) {
+  if (!s) return 0;
+  let cjk = 0, other = 0;
+  for (let i = 0; i < s.length; i++) {
+    const code = s.charCodeAt(i);
+    if (
+      (code >= 0x3400 && code <= 0x9FFF) ||
+      (code >= 0xAC00 && code <= 0xD7AF) ||
+      (code >= 0x3000 && code <= 0x30FF) ||
+      (code >= 0xFF00 && code <= 0xFFEF)
+    ) cjk++;
+    else other++;
+  }
+  return cjk + Math.ceil(other / 4);
+}
+
+function formatTokens(n) {
+  return n.toLocaleString("en-US");
+}
+
 function updateBadge() {
   const o = els.original.value;
   const m = els.modified.value;
   els.originalBadge.textContent = (o ? o.split("\n").length : 0) + " 行";
   els.modifiedBadge.textContent = (m ? m.split("\n").length : 0) + " 行";
+  els.originalTokens.textContent = "≈ " + formatTokens(estimateTokens(o)) + " tokens";
+  els.modifiedTokens.textContent = "≈ " + formatTokens(estimateTokens(m)) + " tokens";
 }
 
 // ---------- Diff core (LCS based) ----------
@@ -1702,6 +1898,28 @@ function buildExportHeader(title, displayStamp) {
   return wrap;
 }
 
+// Build the diff-record block for export (PDF/PNG). Returns null when empty.
+function buildExportRecord() {
+  const html = els.diffRecord.innerHTML;
+  const probe = document.createElement("div");
+  probe.innerHTML = html;
+  const hasText = probe.textContent.trim().length > 0;
+  const hasMedia = !!probe.querySelector("img, hr");
+  if (!hasText && !hasMedia) return null;
+
+  const wrap = document.createElement("div");
+  wrap.className = "export-record";
+  const label = document.createElement("div");
+  label.className = "export-record-label";
+  label.textContent = "对比说明";
+  const body = document.createElement("div");
+  body.className = "export-record-body";
+  body.innerHTML = html;
+  wrap.appendChild(label);
+  wrap.appendChild(body);
+  return wrap;
+}
+
 function hasDiffContent() {
   return !!els.diffOutput.querySelector(".diff-sbs, .diff-unified, .diff-identical");
 }
@@ -1733,6 +1951,10 @@ function exportPdf() {
   const mainEl = document.querySelector("main");
   mainEl.insertBefore(headerEl, els.stats);
 
+  // Inject the diff-record note (if any) just below the header.
+  const recordEl = buildExportRecord();
+  if (recordEl) mainEl.insertBefore(recordEl, els.stats);
+
   // Hide modal so the print preview is clean.
   els.exportModalOverlay.hidden = true;
 
@@ -1745,6 +1967,7 @@ function exportPdf() {
     if (cleaned) return;
     cleaned = true;
     if (headerEl.parentNode) headerEl.parentNode.removeChild(headerEl);
+    if (recordEl && recordEl.parentNode) recordEl.parentNode.removeChild(recordEl);
     document.title = oldTitle;
     window.removeEventListener("afterprint", cleanup);
   };
@@ -1789,6 +2012,10 @@ async function exportPng() {
   const headerEl = buildExportHeader(title, stamp.display);
   headerEl.style.display = "block";
   exportRoot.appendChild(headerEl);
+
+  // Diff-record note (if any)
+  const recordEl = buildExportRecord();
+  if (recordEl) exportRoot.appendChild(recordEl);
 
   // Stats clone
   const statsClone = els.stats.cloneNode(true);
@@ -2035,6 +2262,7 @@ function saveCurrent() {
     granularity: els.granularity.value,
     ignoreWhitespace: els.ignoreWhitespace.checked,
     wrapLines: els.wrapLines.checked,
+    diffRecord: els.diffRecord.innerHTML,
     stats,
     savedAt: Date.now(),
     groupId: state.saveTarget,
@@ -2052,6 +2280,7 @@ function loadHistoryItem(id) {
   if (!item) return;
   els.original.value = item.original || "";
   els.modified.value = item.modified || "";
+  els.diffRecord.innerHTML = item.diffRecord || "";
   if (item.viewMode) els.viewMode.value = item.viewMode;
   if (item.granularity) els.granularity.value = item.granularity;
   els.ignoreWhitespace.checked = !!item.ignoreWhitespace;
@@ -2121,6 +2350,8 @@ function renderItem(item) {
   const isActive = item.id === activeHistoryId;
   const time = formatRelativeTime(item.savedAt);
   const stats = item.stats || { added: 0, removed: 0 };
+  const hasRecord = item.diffRecord && item.diffRecord.replace(/<[^>]*>/g, "").trim();
+  const recordMark = hasRecord ? '<span class="history-item-note" title="含对比说明">📝</span>' : "";
 
   // Build "move to..." dropdown listing other groups + ungrouped (if currently grouped).
   let moveSelect = "";
@@ -2137,7 +2368,7 @@ function renderItem(item) {
   return `<div class="history-item${isActive ? " active" : ""}" data-id="${item.id}">
     <div class="history-item-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</div>
     <div class="history-item-meta">
-      <span>${time}</span>
+      <span>${time}${recordMark}</span>
       <span class="history-item-stats">
         <span class="history-item-stat-add">+${stats.added}</span>
         <span class="history-item-stat-remove">-${stats.removed}</span>
@@ -2325,12 +2556,71 @@ els.demoBtn.addEventListener("click", () => {
 els.clearBtn.addEventListener("click", () => {
   els.original.value = "";
   els.modified.value = "";
+  els.diffRecord.innerHTML = "";
   activeHistoryId = null;
   updateBadge();
   els.diffOutput.innerHTML = '<div class="diff-empty">输入两个版本，点击「对比」查看差异 · 也可以点击「加载示例」</div>';
   renderStats(null);
   renderHistory();
 });
+
+// ---- Diff record rich-text toolbar ----
+const DR_STATE_CMDS = ["bold", "italic", "underline", "strikeThrough"];
+let drSavedRange = null;
+
+function saveDRSelection() {
+  const sel = window.getSelection();
+  if (sel && sel.rangeCount > 0) {
+    const r = sel.getRangeAt(0);
+    if (els.diffRecord.contains(r.commonAncestorContainer)) drSavedRange = r.cloneRange();
+  }
+}
+
+function restoreDRSelection() {
+  if (!drSavedRange) return;
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(drSavedRange);
+}
+
+function updateDRToolbarState() {
+  els.diffRecordToolbar.querySelectorAll("button[data-cmd]").forEach((btn) => {
+    if (!DR_STATE_CMDS.includes(btn.dataset.cmd)) return;
+    let on = false;
+    try { on = document.queryCommandState(btn.dataset.cmd); } catch (e) {}
+    btn.classList.toggle("active", on);
+  });
+}
+
+function execDR(cmd, value) {
+  els.diffRecord.focus();
+  restoreDRSelection();
+  try { document.execCommand("styleWithCSS", false, true); } catch (e) {}
+  document.execCommand(cmd, false, value == null ? null : value);
+  saveDRSelection();
+  updateDRToolbarState();
+}
+
+// Keep the editor selection from collapsing when a toolbar button is pressed.
+els.diffRecordToolbar.addEventListener("mousedown", (e) => {
+  if (e.target.closest("button[data-cmd]")) e.preventDefault();
+});
+els.diffRecordToolbar.addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-cmd]");
+  if (btn) execDR(btn.dataset.cmd);
+});
+els.diffRecordToolbar.querySelectorAll("select[data-cmd]").forEach((sel) => {
+  sel.addEventListener("change", () => {
+    if (sel.value) execDR(sel.dataset.cmd, sel.value);
+    sel.selectedIndex = 0;
+  });
+});
+els.diffRecordToolbar.querySelectorAll('input[type="color"][data-cmd]').forEach((inp) => {
+  inp.addEventListener("input", () => execDR(inp.dataset.cmd, inp.value));
+});
+els.diffRecord.addEventListener("keyup", () => { saveDRSelection(); updateDRToolbarState(); });
+els.diffRecord.addEventListener("mouseup", () => { saveDRSelection(); updateDRToolbarState(); });
+els.diffRecord.addEventListener("input", saveDRSelection);
 
 els.sidebarToggle.addEventListener("click", () => {
   document.body.classList.toggle("sidebar-collapsed");
