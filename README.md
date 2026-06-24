@@ -14,7 +14,7 @@
 
 ## 🌐 English summary
 
-A tiny, offline diff viewer for code & LLM prompts. Side-by-side or unified view, word/char/line-level inline highlighting, 11 color themes, history with grouping, all stored locally in your browser — **no network calls, ever**.
+A tiny, offline diff viewer for code & LLM prompts. Side-by-side or unified view, word/char/line-level inline highlighting, 11 color themes, history with grouping, a **rich-text "Diff Record" box** for annotating what changed between versions, and live token-count deltas — all stored locally in your browser — **no network calls, ever**.
 
 - **macOS users** → download [CodeReviewTool.dmg](https://github.com/Looperswag/diff-viewer/releases/latest/download/CodeReviewTool.dmg)
 - **Any other OS / just want the web app** → download [index.html](https://github.com/Looperswag/diff-viewer/releases/latest/download/index.html), double-click to open in your browser
@@ -29,7 +29,7 @@ The whole tool is a single self-contained HTML file (~270 KB) with html2canvas i
 一个轻量的本地差异对比工具，主要解决两个场景：
 
 1. **代码 review** —— 把两段代码贴进来，按词/字符/行三档粒度直观看到改了什么，比 IDE 自带的 diff 友好得多
-2. **提示词迭代** —— 系统提示词每改一版都难追溯？这里能保存历史、分组管理、并且导出 PDF / 长图发给合作方
+2. **提示词迭代** —— 系统提示词每改一版都难追溯？这里能保存历史、分组管理、用富文本「对比说明」批注每一版改了什么 / 为什么改，并且导出 PDF / 长图发给合作方
 
 整个工具就是一个 `index.html` 单文件，所有功能（包括 PDF/长图导出依赖的 html2canvas）都已内联，不联网、不上传、不调用任何第三方接口。数据通过浏览器 / WKWebView 的 `localStorage` 持久化在本机。
 
@@ -39,8 +39,10 @@ The whole tool is a single self-contained HTML file (~270 KB) with html2canvas i
 |---|---|
 | 🔀 **两种视图** | 并排对比 / 统一视图自由切换 |
 | 🎯 **三档高亮粒度** | 词级 / 字符级 / 行级 —— 改了几个字也能精确高亮，不是只看到"整行红/绿" |
-| 📤 **导出 PDF / 长图 PNG** | 一键导出当前对比结果，标题 + 时间戳 + 完整 diff 一张图分享 |
-| 📚 **历史 + 分组** | 任意保存对比快照，左侧侧边栏自由切换、可拖入分组归类 |
+| 🔢 **Token 增量** | 实时显示两版的预估 token 数与增减量（绝对值 + 百分比），提示词扩写 / 精简一眼可量化 |
+| 📝 **对比说明（Diff Record）** | 富文本批注框，用文字记录原始版本与迭代版本的区别：支持中英字体、字号、加粗 / 斜体 / 下划线 / 删除线、高亮与文字颜色；随「保存」一起进入历史记录，随导出写入 PDF / 长图 |
+| 📤 **导出 PDF / 长图 PNG** | 一键导出当前对比结果，标题 + 时间戳 + 对比说明 + 完整 diff 一张图分享 |
+| 📚 **历史 + 分组** | 任意保存对比快照（含对比说明），左侧侧边栏自由切换、可拖入分组归类，带批注的记录有 📝 标记 |
 | 🎨 **11 套主题** | 经典深 / 浅、液态玻璃、极光梦境、樱花 Ins、摩纳哥黑金、北欧极简、日落暮光、珍珠白、赛博霓虹、摩卡咖啡 |
 | 🔧 **辅助选项** | 忽略空白差异、长行自动换行、文件直接上传、左右一键交换 |
 | 🔒 **完全本地** | 不联网、不 telemetry、所有数据只在你本机的 `localStorage` |
