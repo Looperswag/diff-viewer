@@ -1596,7 +1596,10 @@ function doCompare() {
 
   if (original === modified) {
     els.diffOutput.innerHTML = '<div class="diff-identical">两个版本完全相同，没有差异</div>';
-    renderStats({ added: 0, removed: 0, unchanged: splitLines(original).length });
+    renderStats(
+      { added: 0, removed: 0, unchanged: splitLines(original).length },
+      { o: estimateTokens(original), m: estimateTokens(modified) }
+    );
     return;
   }
 
@@ -1607,7 +1610,7 @@ function doCompare() {
   const parts = lineDiff(original, modified, ignoreWs);
   const blocks = groupBlocks(parts);
   const stats = computeStats(blocks);
-  renderStats(stats);
+  renderStats(stats, { o: estimateTokens(original), m: estimateTokens(modified) });
 
   const wrapCls = els.wrapLines.checked ? " wrap" : "";
   const inner = viewMode === "unified"
@@ -1617,7 +1620,29 @@ function doCompare() {
   els.diffOutput.innerHTML = inner;
 }
 
-function renderStats(stats) {
+function buildTokenChip(tokenInfo) {
+  if (!tokenInfo) return "";
+  const o = tokenInfo.o || 0;
+  const m = tokenInfo.m || 0;
+  const delta = m - o;
+  let pct;
+  if (o > 0) pct = (delta / o) * 100;
+  else pct = m > 0 ? 100 : 0;
+  const sign = delta > 0 ? "+" : (delta < 0 ? "" : "±");
+  const cls = delta > 0 ? "stat-tokens-delta-up"
+            : delta < 0 ? "stat-tokens-delta-down"
+            : "";
+  const deltaText =
+    ` <span class="${cls}">${sign}${formatTokens(delta)} ` +
+    `(${sign}${pct.toFixed(1)}%)</span>`;
+  return (
+    `<span class="stat-tokens">` +
+    `≈ ${formatTokens(o)} → ${formatTokens(m)} tokens${deltaText}` +
+    `</span>`
+  );
+}
+
+function renderStats(stats, tokenInfo) {
   const legend = `<div class="legend">
     <div class="legend-item"><span class="legend-swatch swatch-add"></span>新增行</div>
     <div class="legend-item"><span class="legend-swatch swatch-remove"></span>删除行</div>
@@ -1632,6 +1657,7 @@ function renderStats(stats) {
     `<span class="stat-added">+ ${stats.added} 行新增</span>` +
     `<span class="stat-removed">- ${stats.removed} 行删除</span>` +
     `<span class="stat-unchanged">${stats.unchanged} 行未变</span>` +
+    buildTokenChip(tokenInfo) +
     legend;
 }
 
