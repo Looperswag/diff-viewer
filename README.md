@@ -14,13 +14,13 @@
 
 ## 🌐 English summary
 
-A tiny, offline diff viewer for code & LLM prompts. Side-by-side or unified view, word/char/line-level inline highlighting, 11 color themes, history with grouping, a **rich-text "Diff Record" box** for annotating what changed between versions, and live token-count deltas — all stored locally in your browser — **no network calls, ever**.
+A self-contained, offline diff viewer for code & LLM prompts. Side-by-side or unified view, word/char/line-level inline highlighting, 13 color themes, history with grouping, a **rich-text "Diff Record" box** for annotating what changed between versions, and live token-count deltas — all stored locally in your browser — **no network calls, ever**.
 
 - **macOS users** → download [CodeReviewTool.dmg](https://github.com/Looperswag/diff-viewer/releases/latest/download/CodeReviewTool.dmg)
 - **Any other OS / just want the web app** → download [index.html](https://github.com/Looperswag/diff-viewer/releases/latest/download/index.html), double-click to open in your browser
 - **PDF / long-screenshot export** built in — share two-version diffs as a single file with teammates
 
-The whole tool is a single self-contained HTML file (~270 KB) with html2canvas inlined. No build step. No tracking. Right-click → Open on first macOS launch (ad-hoc signed, not notarized).
+The whole tool is a single self-contained HTML file (~15 MB — all fonts, themes and the html2canvas export library are embedded so it runs 100% offline). No build step. No tracking. Right-click → Open on first macOS launch (ad-hoc signed, not notarized).
 
 ---
 
@@ -43,7 +43,7 @@ The whole tool is a single self-contained HTML file (~270 KB) with html2canvas i
 | 📝 **对比说明（Diff Record）** | 富文本批注框，用文字记录原始版本与迭代版本的区别：支持中英字体、字号、加粗 / 斜体 / 下划线 / 删除线、高亮与文字颜色；随「保存」一起进入历史记录，随导出写入 PDF / 长图 |
 | 📤 **导出 PDF / 长图 PNG** | 一键导出当前对比结果，标题 + 时间戳 + 对比说明 + 完整 diff 一张图分享 |
 | 📚 **历史 + 分组** | 任意保存对比快照（含对比说明），左侧侧边栏自由切换、可拖入分组归类，带批注的记录有 📝 标记 |
-| 🎨 **11 套主题** | 经典深 / 浅、液态玻璃、极光梦境、樱花 Ins、摩纳哥黑金、北欧极简、日落暮光、珍珠白、赛博霓虹、摩卡咖啡 |
+| 🎨 **13 套主题** | 经典深 / 浅、液态玻璃、极光梦境、樱花 Ins、摩纳哥黑金、北欧极简、日落暮光、珍珠白、赛博霓虹、摩卡咖啡、复古打字机、漫画分镜 |
 | 🔧 **辅助选项** | 忽略空白差异、长行自动换行、文件直接上传、左右一键交换 |
 | 🔒 **完全本地** | 不联网、不 telemetry、所有数据只在你本机的 `localStorage` |
 | 📦 **零依赖单文件** | `index.html` 一个文件就是全部，html2canvas 已内联，可以扔到任何浏览器 |
@@ -60,7 +60,7 @@ The whole tool is a single self-contained HTML file (~270 KB) with html2canvas i
 
 - 系统要求：macOS 11 Big Sur 及以上
 - 架构：通用二进制（arm64 + x86_64），M 系列芯片和 Intel 都支持
-- 体积：DMG 约 1.7 MB / App 约 1.8 MB
+- 体积：约 15 MB（已把全部字体 / 主题 / 导出库内嵌进单文件，完全离线）
 
 ### 其他系统 / 想直接用浏览器
 
