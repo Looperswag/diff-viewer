@@ -8,6 +8,12 @@
 
 <img src="docs/screenshots/hero.png" alt="主界面" width="100%">
 
+### ⬇️ 下载即用
+
+**[👉 下载 `index.html`](https://github.com/Looperswag/diff-viewer/releases/latest/download/index.html)** —— 双击用浏览器打开**就能直接用** · 任何系统 · 免安装 · 不联网
+
+**[🍎 macOS 原生 App（.dmg）](https://github.com/Looperswag/diff-viewer/releases/latest/download/CodeReviewTool.dmg)** —— 拖进 Applications 即可
+
 </div>
 
 ---

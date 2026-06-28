@@ -6,7 +6,7 @@ BUILD="$ROOT/build"
 DIST="$ROOT/dist"
 
 APP_NAME="CodeReviewTool"
-VERSION="1.1.0"
+VERSION="2.0.0"
 VOLUME_NAME="代码对比工具"
 
 APP="$DIST/$APP_NAME.app"
